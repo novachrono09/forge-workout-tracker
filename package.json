@@ -1,0 +1,17 @@
+{
+  "name": "forge-workout-tracker",
+  "version": "1.0.0",
+  "description": "FORGE — Strength OS progressive overload tracker",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 server.py"
+  },
+  "keywords": [
+    "pwa",
+    "workout-tracker",
+    "fitness",
+    "strength-os"
+  ],
+  "author": "",
+  "license": "MIT"
+}

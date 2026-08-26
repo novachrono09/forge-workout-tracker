@@ -1,0 +1,6 @@
+{
+  "appId": "com.forge.workouttracker",
+  "appName": "FORGE Workout Tracker",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}
