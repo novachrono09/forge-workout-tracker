@@ -3881,9 +3881,262 @@ body.history-multi-mode .hist-checkbox {
   100% { transform: rotate(360deg); }
 }
 
+/* ══════════ Kinetic Strike Boot Animation ══════════ */
+.splash {
+  --lime: #D6FF3F;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --hit: cubic-bezier(0.2, 0.9, 0.2, 1);
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 42%;
+  z-index: 999999;
+}
+
+.splash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  opacity: 0.05;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.splash .stage {
+  position: relative;
+  width: min(72vw, 320px);
+  height: min(88vh, 560px);
+}
+
+.splash .flash,
+.splash .flash2 {
+  position: absolute;
+  inset: -200vh -200vw;
+  opacity: 0;
+  pointer-events: none;
+}
+.splash .flash { background: #fff; mix-blend-mode: overlay; }
+.splash .flash2 { background: var(--lime); mix-blend-mode: screen; }
+
+.splash .impact-line {
+  position: absolute;
+  left: 50%;
+  top: -40vh;
+  height: 140vh;
+  width: 1px;
+  background: var(--lime);
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: 50% 42%;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.splash .trailL,
+.splash .trailR {
+  position: absolute;
+  top: 42%;
+  height: 2px;
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  filter: blur(0.2px);
+}
+.splash .trailL {
+  right: 50%;
+  background: linear-gradient(90deg, transparent, #fff);
+}
+.splash .trailR {
+  left: 50%;
+  background: linear-gradient(90deg, #fff, transparent);
+}
+
+.splash .ring,
+.splash .ring2,
+.splash .ring3 {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.splash .stack {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: min(56vw, 220px);
+  height: min(56vw, 220px);
+  transform: translate(-50%, -50%);
+}
+.splash .stack svg { width: 100%; height: 100%; overflow: visible; }
+
+.splash .left { transform-box: fill-box; transform-origin: 100% 50%; }
+.splash .right { transform-box: fill-box; transform-origin: 0% 50%; }
+.splash .tri { transform-box: fill-box; transform-origin: 50% 0%; }
+
+.splash .word {
+  position: absolute;
+  left: 0; right: 0;
+  top: 68%;
+  display: flex;
+  justify-content: center;
+  font-weight: 900;
+  font-size: clamp(36px, 11vw, 56px);
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: #ffffff;
+}
+.splash .word span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(28px) scale(0.8);
+}
+
+.splash .sub {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(68% + 58px);
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(10px, 2.6vw, 12px);
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  color: var(--lime);
+  opacity: 0;
+}
+
+.splash.play { animation: zoomOut 2.8s cubic-bezier(0.77, 0, 0.18, 1) forwards; }
+.splash.play .left { animation: slamL 2.8s var(--hit) forwards; }
+.splash.play .right { animation: slamR 2.8s var(--hit) forwards; }
+.splash.play .tri { animation: ignite 2.8s var(--hit) forwards; filter: drop-shadow(0 0 12px var(--lime)); }
+.splash.play .flash { animation: flash 2.8s linear forwards; }
+.splash.play .flash2 { animation: flashLime 2.8s linear forwards; }
+.splash.play .ring { animation: shock 2.8s var(--ease) forwards; }
+.splash.play .ring2 { animation: shock 2.8s 0.06s var(--ease) forwards; }
+.splash.play .ring3 { animation: shock 2.8s 0.12s var(--ease) forwards; }
+.splash.play .trailL, .splash.play .trailR { animation: trail 2.8s var(--ease) forwards; }
+.splash.play .word span { animation: punch 2.8s var(--ease) forwards; }
+.splash.play .word span:nth-child(2) { animation-delay: 0.03s; }
+.splash.play .word span:nth-child(3) { animation-delay: 0.06s; }
+.splash.play .word span:nth-child(4) { animation-delay: 0.09s; }
+.splash.play .sub { animation: subIn 2.8s var(--ease) forwards; }
+.splash.play .impact-line { animation: line 2.8s var(--ease) forwards; }
+.splash.play .stack { animation: stackHold 2.8s var(--ease) forwards; }
+
+@keyframes slamL {
+  0% { transform: translate(-86px, -8px) rotate(-18deg); opacity: 0; }
+  8% { opacity: 1; }
+  22% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  26% { transform: translate(3px, 0) rotate(1deg); }
+  32% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(0, 0) rotate(0); opacity: 1; }
+}
+@keyframes slamR {
+  0% { transform: translate(86px, -8px) rotate(18deg); opacity: 0; }
+  8% { opacity: 1; }
+  22% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  26% { transform: translate(-3px, 0) rotate(-1deg); }
+  32% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(0, 0) rotate(0); opacity: 1; }
+}
+@keyframes ignite {
+  0%, 24% { opacity: 0; transform: scale(0.15) translateY(-8px); }
+  32% { opacity: 1; transform: scale(1.35) translateY(0); }
+  40% { transform: scale(0.92) translateY(0); }
+  48% { transform: scale(1) translateY(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes flash {
+  0%, 20% { opacity: 0; }
+  22% { opacity: 0.85; }
+  28% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes flashLime {
+  0%, 22% { opacity: 0; }
+  24% { opacity: 0.35; }
+  34% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes shock {
+  0%, 21% { transform: scale(0.2); opacity: 0; border-color: transparent; }
+  22% { opacity: 1; border-color: rgba(214,255,63,0.85); }
+  55% { transform: scale(9); opacity: 0; border-color: transparent; }
+  100% { transform: scale(9); opacity: 0; }
+}
+@keyframes trail {
+  0% { width: 0; opacity: 0; }
+  6% { opacity: 0.9; }
+  20% { width: 42vw; opacity: 0; }
+  100% { width: 42vw; opacity: 0; }
+}
+@keyframes punch {
+  0%, 38% { opacity: 0; transform: translateY(28px) scale(0.84); filter: blur(6px); }
+  52% { opacity: 1; transform: translateY(-4px) scale(1.04); filter: blur(0); }
+  60%, 72% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  88%, 100% { opacity: 0; transform: translateY(12px) scale(0.95); filter: blur(8px); }
+}
+@keyframes subIn {
+  0%, 48% { opacity: 0; letter-spacing: 0.9em; }
+  62%, 72% { opacity: 1; letter-spacing: 0.5em; }
+  88%, 100% { opacity: 0; letter-spacing: 0.5em; transform: translateY(8px); }
+}
+@keyframes line {
+  0% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+  10% { transform: translateX(-50%) scaleY(1); opacity: 0.55; }
+  26% { opacity: 0; transform: translateX(-50%) scaleY(1); }
+  100% { opacity: 0; }
+}
+@keyframes stackHold {
+  0%, 72% { transform: translate(-50%, -50%) scale(1); filter: blur(0); opacity: 1; }
+  88% { opacity: 0; filter: blur(10px); }
+  100% { transform: translate(-50%, -50%) scale(1.35); filter: blur(14px); opacity: 0; }
+}
+@keyframes zoomOut {
+  0%, 72% { opacity: 1; transform: scale(1); filter: blur(0); }
+  88% { opacity: 0; transform: scale(1.28); filter: blur(16px); }
+  100% { opacity: 0; transform: scale(1.4); filter: blur(20px); visibility: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash.play, .splash.play * {
+    animation-duration: 0.4s !important;
+    animation-delay: 0s !important;
+  }
+}
+
 </style>
 </head>
 <body>
+<div class="splash play" id="splash">
+  <div class="stage">
+    <div class="impact-line"></div>
+    <div class="trailL"></div>
+    <div class="trailR"></div>
+    <div class="ring"></div>
+    <div class="ring2"></div>
+    <div class="ring3"></div>
+    <div class="stack">
+      <svg viewBox="0 0 108 108">
+        <path class="left" fill="#fff" d="M 28 28 L 44 28 L 54 48 L 54 64 L 46 64 Z" />
+        <path class="right" fill="#fff" d="M 64 28 L 80 28 L 62 64 L 54 64 L 54 48 Z" />
+        <path class="tri" fill="#D6FF3F" d="M 49 70 L 59 70 L 54 80 Z" />
+      </svg>
+    </div>
+    <div class="word"><span>V</span><span>A</span><span>N</span><span>T</span></div>
+    <div class="sub">STRENGTH OS</div>
+  </div>
+  <div class="flash"></div>
+  <div class="flash2"></div>
+</div>
 <div class="grain"></div>
 <div class="app" id="app">
   <aside class="sidebar" id="sidebar">
@@ -9415,6 +9668,25 @@ body.history-multi-mode .hist-checkbox {
 
   const content = document.getElementById("content");
   if (content) decorate(content);
+
+  // Kinetic Strike Boot Splash lifecycle
+  (function initBootSplash() {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+
+    splash.addEventListener("animationend", (e) => {
+      if (e.animationName === "zoomOut") {
+        splash.style.display = "none";
+      }
+    });
+
+    // Fallback: hide after animation duration (2.8s + safety padding)
+    setTimeout(() => {
+      if (splash && splash.style.display !== "none") {
+        splash.style.display = "none";
+      }
+    }, 3200);
+  })();
 })();
 </script>
 
