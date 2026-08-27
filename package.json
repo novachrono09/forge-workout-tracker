@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "description": "FORGE — Strength OS progressive overload tracker",
   "main": "index.html",
+  "type": "module",
   "scripts": {
-    "start": "python3 server.py"
+    "start": "python3 server.py",
+    "dev": "node node_modules/vite/bin/vite.js",
+    "build": "node node_modules/vite/bin/vite.js build",
+    "cap:init": "node node_modules/@capacitor/cli/bin/capacitor init FORGE com.forge.strengthos --web-dir dist",
+    "cap:add": "node node_modules/@capacitor/cli/bin/capacitor add android",
+    "cap:sync": "npm run build && node node_modules/@capacitor/cli/bin/capacitor sync android",
+    "apk:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
+    "apk:release": "npm run cap:sync && cd android && ./gradlew assembleRelease"
   },
   "keywords": [
     "pwa",
@@ -13,5 +21,19 @@
     "strength-os"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^8.2.2"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3"
+  }
 }

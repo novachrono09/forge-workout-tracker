@@ -1,6 +1,24 @@
 {
-  "appId": "com.forge.workouttracker",
-  "appName": "FORGE Workout Tracker",
-  "webDir": ".",
-  "bundledWebRuntime": false
+  "appId": "com.forge.strengthos",
+  "appName": "FORGE",
+  "webDir": "dist",
+  "backgroundColor": "#07080b",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "androidScaleType": "CENTER_CROP",
+      "backgroundColor": "#07080b"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_forge",
+      "iconColor": "#FF6B35"
+    }
+  }
 }
