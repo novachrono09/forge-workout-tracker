@@ -7,8 +7,8 @@
     <!-- VANT Notification Bar White Glyph -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M 40,24 L 68,24 L 63,29 L 45,29 Z" />
+        android:pathData="M 28,28 L 44,28 L 54,48 L 64,28 L 80,28 L 62,64 L 46,64 Z" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M 27,33 L 44,33 L 54,69 L 64,33 L 81,33 L 60,82 L 48,82 Z" />
+        android:pathData="M 49,70 L 59,70 L 54,80 Z" />
 </vector>

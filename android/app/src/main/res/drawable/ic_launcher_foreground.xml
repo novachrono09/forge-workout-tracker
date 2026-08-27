@@ -4,12 +4,12 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- VANT Top Power Accent -->
+    <!-- VANT Minimal Geometric V Monogram -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 28,28 L 44,28 L 54,48 L 64,28 L 80,28 L 62,64 L 46,64 Z" />
+    <!-- VANT Accent Downward Chevron -->
     <path
         android:fillColor="#D6FF3F"
-        android:pathData="M 40,24 L 68,24 L 63,29 L 45,29 Z" />
-    <!-- VANT Chevron Monogram -->
-    <path
-        android:fillColor="#D6FF3F"
-        android:pathData="M 27,33 L 44,33 L 54,69 L 64,33 L 81,33 L 60,82 L 48,82 Z" />
+        android:pathData="M 49,70 L 59,70 L 54,80 Z" />
 </vector>

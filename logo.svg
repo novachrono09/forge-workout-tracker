@@ -1,13 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
-  <rect width="108" height="108" rx="28" fill="#07080b"/>
-  <!-- VANT Top Power Accent -->
-  <path d="M 40 24 L 68 24 L 63 29 L 45 29 Z" fill="#d6ff3f"/>
-  <!-- VANT Chevron Monogram -->
-  <path d="M 27 33 L 44 33 L 54 69 L 64 33 L 81 33 L 60 82 L 48 82 Z" fill="url(#vant-grad)"/>
-  <defs>
-    <linearGradient id="vant-grad" x1="27" y1="33" x2="81" y2="82" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#d6ff3f"/>
-      <stop offset="100%" stop-color="#3ee0c5"/>
-    </linearGradient>
-  </defs>
+  <rect width="108" height="108" rx="28" fill="#08090C"/>
+  <path fill="#FFFFFF" d="M 28 28 L 44 28 L 54 48 L 64 28 L 80 28 L 62 64 L 46 64 Z"/>
+  <path fill="#D6FF3F" d="M 49 70 L 59 70 L 54 80 Z"/>
 </svg>
