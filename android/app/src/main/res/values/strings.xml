@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">FORGE</string>
-    <string name="title_activity_main">FORGE</string>
+    <string name="app_name">VANT</string>
+    <string name="title_activity_main">VANT</string>
     <string name="package_name">com.forge.strengthos</string>
     <string name="custom_url_scheme">com.forge.strengthos</string>
 </resources>

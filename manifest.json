@@ -1,6 +1,6 @@
 {
-  "name": "FORGE — Strength OS",
-  "short_name": "FORGE",
+  "name": "VANT — Strength OS",
+  "short_name": "VANT",
   "description": "Billion dollar strength OS, progressive overload tracking, exercise library, and workout analytics engine.",
   "start_url": "./index.html",
   "display": "standalone",
