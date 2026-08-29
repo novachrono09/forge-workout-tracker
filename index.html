@@ -4136,11 +4136,13 @@ body.history-multi-mode .hist-checkbox {
 @keyframes punch {
   0%, 38% { opacity: 0; transform: translate3d(0, 28px, 0) scale3d(0.84, 0.84, 1); }
   52% { opacity: 1; transform: translate3d(0, -4px, 0) scale3d(1.04, 1.04, 1); }
-  60%, 100% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
+  60%, 72% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
+  88%, 100% { opacity: 0; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
 }
 @keyframes subIn {
   0%, 48% { opacity: 0; transform: translate3d(0, 10px, 0); }
-  62%, 100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  62%, 72% { opacity: 1; transform: translate3d(0, 0, 0); }
+  88%, 100% { opacity: 0; transform: translate3d(0, 0, 0); }
 }
 @keyframes line {
   0% { transform: translate3d(-50%, 0, 0) scale3d(1, 0, 1); opacity: 0; }
