@@ -4119,55 +4119,6 @@ body.history-multi-mode .hist-checkbox {
   100% { transform: translate3d(calc(var(--dir) * 54vw), 0, 0) scaleX(1.3); opacity: 0; }
 }
 
-.slash {
-  position: absolute;
-  left: -14%;
-  top: 56%;
-  width: 128%;
-  height: clamp(8px, 2.6vw, 12px);
-  background: var(--volt);
-  clip-path: polygon(2.5% 0, 100% 0, 97.5% 100%, 0 100%);
-  will-change: transform;
-  animation: strike 240ms var(--t-strike) both;
-}
-@keyframes strike {
-  0%   { transform: translate3d(-110vw, 0, 0); animation-timing-function: cubic-bezier(.06, .6, .12, 1); }
-  78%  { transform: translate3d(1.8%, 0, 0); animation-timing-function: cubic-bezier(.3, .7, .4, 1); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-.slash .tail--s {
-  position: absolute;
-  right: 100%;
-  top: 15%;
-  bottom: 15%;
-  width: 34vw;
-  background: linear-gradient(90deg, transparent, rgba(214, 255, 63, .6));
-  opacity: 0;
-  will-change: opacity;
-  animation: s-tail 400ms var(--t-strike) both;
-}
-@keyframes s-tail {
-  0%   { opacity: .9; }
-  62%  { opacity: .9; }
-  100% { opacity: 0; }
-}
-
-.scanline {
-  position: absolute;
-  top: calc(56% + clamp(8px, 2.6vw, 12px) / 2);
-  left: 50%;
-  width: 94vw;
-  height: 3px;
-  margin-left: -47vw;
-  opacity: 0;
-  will-change: transform, opacity;
-  background: linear-gradient(90deg, transparent, var(--volt-hi) 18% 82%, transparent);
-  animation: scan 240ms 760ms cubic-bezier(.2, .8, .3, 1) both;
-}
-@keyframes scan {
-  0%   { transform: scaleX(.25); opacity: 1; }
-  100% { transform: scaleX(1); opacity: 0; }
-}
 
 .ghost {
   position: absolute;
@@ -4313,10 +4264,6 @@ body.history-multi-mode .hist-checkbox {
         <div class="tri-wrap">
           <svg viewBox="0 0 108 108"><path fill="#D6FF3F" d="M 49 70 L 59 70 L 54 80 Z"/></svg>
         </div>
-
-        <!-- crossbar strike -->
-        <div class="slash"><i class="tail--s"></i></div>
-
         <!-- static-blur ghost for the defocus exit -->
         <div class="ghost">
           <svg viewBox="0 0 108 108">
@@ -4332,8 +4279,6 @@ body.history-multi-mode .hist-checkbox {
             </g>
           </svg>
         </div>
-
-        <div class="scanline"></div>
       </div>
 
       <div class="word" aria-label="VANT">
