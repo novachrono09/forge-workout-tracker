@@ -1,7 +1,9 @@
 /**
- * VANT Auth Engine — Email & Password + Google Authentication Manager
+ * VANT Auth Engine — Email & Password + Native & Web Google Authentication Manager
  */
 
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { 
   getAuth, 
   createUserWithEmailAndPassword,
@@ -10,8 +12,6 @@ import {
   signOut,
   updateProfile,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   signInAnonymously, 
   onAuthStateChanged,
   GoogleAuthProvider, 
@@ -27,16 +27,6 @@ export class AuthManager {
   }
 
   async initializeAuth() {
-    try {
-      const redirectResult = await getRedirectResult(this.auth);
-      if (redirectResult && redirectResult.user) {
-        this.currentUser = redirectResult.user;
-        this.notifyListeners(redirectResult.user);
-      }
-    } catch (err) {
-      console.warn('[VANT Auth] Redirect result error:', err);
-    }
-
     return new Promise((resolve) => {
       onAuthStateChanged(this.auth, async (user) => {
         this.currentUser = user;
@@ -87,6 +77,28 @@ export class AuthManager {
   }
 
   async signInWithGoogle() {
+    // If running in Native Capacitor Android APK, trigger Native Google Sign-In Sheet
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const result = await FirebaseAuthentication.signInWithGoogle();
+        if (result && result.credential?.idToken) {
+          const credential = GoogleAuthProvider.credential(result.credential.idToken);
+          const userCred = await signInWithCredential(this.auth, credential);
+          this.currentUser = userCred.user;
+          this.notifyListeners(userCred.user);
+          return { user: userCred.user };
+        } else if (result && result.user) {
+          this.currentUser = result.user;
+          this.notifyListeners(result.user);
+          return { user: result.user };
+        }
+      } catch (nativeErr) {
+        console.warn('[VANT Auth] Native Google sign in error:', nativeErr);
+        throw nativeErr;
+      }
+    }
+
+    // Web Browser environment
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -96,14 +108,8 @@ export class AuthManager {
       this.notifyListeners(cred.user);
       return { user: cred.user };
     } catch (err) {
-      console.warn('[VANT Auth] Popup sign-in fallback to redirect:', err);
-      try {
-        await signInWithRedirect(this.auth, provider);
-        return { redirect: true };
-      } catch (redirectErr) {
-        console.error('[VANT Auth] Redirect sign-in error:', redirectErr);
-        throw redirectErr;
-      }
+      console.error('[VANT Auth] Web Google sign in error:', err);
+      throw err;
     }
   }
 
@@ -119,6 +125,13 @@ export class AuthManager {
 
   async logout() {
     try {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await FirebaseAuthentication.signOut();
+        } catch (e) {
+          // ignore native signout warning
+        }
+      }
       await signOut(this.auth);
       this.currentUser = null;
       this.notifyListeners(null);
