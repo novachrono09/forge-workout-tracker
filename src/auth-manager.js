@@ -1,9 +1,15 @@
 /**
- * VANT Auth Engine — Frictionless Anonymous & Account Linking Manager
+ * VANT Auth Engine — Email & Password + Google Authentication Manager
  */
 
 import { 
   getAuth, 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+  updateProfile,
+  signInWithPopup,
   signInAnonymously, 
   onAuthStateChanged,
   GoogleAuthProvider, 
@@ -21,21 +27,9 @@ export class AuthManager {
   async initializeAuth() {
     return new Promise((resolve) => {
       onAuthStateChanged(this.auth, async (user) => {
-        if (user) {
-          this.currentUser = user;
-          this.notifyListeners(user);
-          resolve(user);
-        } else {
-          try {
-            const anonCred = await signInAnonymously(this.auth);
-            this.currentUser = anonCred.user;
-            this.notifyListeners(anonCred.user);
-            resolve(anonCred.user);
-          } catch (err) {
-            console.error('[VANT Auth] Anonymous auth failed:', err);
-            resolve(null);
-          }
-        }
+        this.currentUser = user;
+        this.notifyListeners(user);
+        resolve(user);
       });
     });
   }
@@ -46,40 +40,72 @@ export class AuthManager {
 
   onAuthStateChanged(cb) {
     this.authStateListeners.push(cb);
-    if (this.currentUser) cb(this.currentUser);
+    if (this.currentUser !== undefined) cb(this.currentUser);
   }
 
   notifyListeners(user) {
     this.authStateListeners.forEach((cb) => cb(user));
   }
 
-  async linkWithGoogle(idToken) {
-    const user = this.getCurrentUser();
-    if (!user) throw new Error("No active user session.");
-
-    const credential = GoogleAuthProvider.credential(idToken);
-
+  async signUpWithEmail(email, password, displayName) {
     try {
-      const userCredential = await linkWithCredential(user, credential);
-      this.currentUser = userCredential.user;
-      this.notifyListeners(this.currentUser);
-      return { status: 'LINKED', user: this.currentUser };
-    } catch (error) {
-      if (error.code === 'auth/credential-already-in-use') {
-        return { 
-          status: 'ACCOUNT_COLLISION', 
-          credential,
-          message: 'This Google Account is already linked to another user.' 
-        };
+      const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+      if (displayName) {
+        await updateProfile(cred.user, { displayName });
       }
-      throw error;
+      this.currentUser = cred.user;
+      this.notifyListeners(cred.user);
+      return { user: cred.user };
+    } catch (err) {
+      console.error('[VANT Auth] Sign up error:', err);
+      throw err;
     }
   }
 
-  async resolveCollisionBySwitching(credential) {
-    const userCredential = await signInWithCredential(this.auth, credential);
-    this.currentUser = userCredential.user;
-    this.notifyListeners(this.currentUser);
-    return this.currentUser;
+  async signInWithEmail(email, password) {
+    try {
+      const cred = await signInWithEmailAndPassword(this.auth, email, password);
+      this.currentUser = cred.user;
+      this.notifyListeners(cred.user);
+      return { user: cred.user };
+    } catch (err) {
+      console.error('[VANT Auth] Sign in error:', err);
+      throw err;
+    }
+  }
+
+  async signInWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(this.auth, provider);
+      this.currentUser = cred.user;
+      this.notifyListeners(cred.user);
+      return { user: cred.user };
+    } catch (err) {
+      console.error('[VANT Auth] Google sign in error:', err);
+      throw err;
+    }
+  }
+
+  async sendPasswordReset(email) {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+      return true;
+    } catch (err) {
+      console.error('[VANT Auth] Password reset error:', err);
+      throw err;
+    }
+  }
+
+  async logout() {
+    try {
+      await signOut(this.auth);
+      this.currentUser = null;
+      this.notifyListeners(null);
+      return true;
+    } catch (err) {
+      console.error('[VANT Auth] Sign out error:', err);
+      throw err;
+    }
   }
 }

@@ -4,6 +4,7 @@ import { RestTimer } from './native/rest-timer';
 import { initNativeChrome, hideSplash } from './native/chrome';
 import { initBackHandler } from './native/back-button';
 import { FirebaseCloud } from './firebase-cloud';
+import { vantAuthUI } from './auth-ui';
 
 // Bridge Native Haptics to FORGE window.Haptics
 window.Haptics = {
@@ -20,6 +21,7 @@ window.Haptics = {
 // Expose native helpers globally for FORGE runtime
 window.FORGEKeepAwake = KeepAwake;
 window.FORGERestTimer = RestTimer;
+window.VANTAuthUI = vantAuthUI;
 
 // UI bridge for Android hardware back button
 const uiBridge = {
@@ -43,6 +45,17 @@ const uiBridge = {
     return false;
   }
 };
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Attach Auth button click handler to sidebar avatar chip
+  const userChip = document.querySelector('.user-chip');
+  if (userChip) {
+    userChip.style.cursor = 'pointer';
+    userChip.addEventListener('click', () => {
+      vantAuthUI.show('signup');
+    });
+  }
+});
 
 if (Capacitor.isNativePlatform()) {
   initNativeChrome();

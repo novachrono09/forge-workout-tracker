@@ -4,3 +4,4 @@ dist/
 *.keystore
 keystore.properties
 .DS_Store
+build/
