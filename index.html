@@ -3881,416 +3881,315 @@ body.history-multi-mode .hist-checkbox {
   100% { transform: rotate(360deg); }
 }
 
-/* ══════════ Compositor-Driven Kinetic Strike Boot Animation ══════════ */
+/* ══════════ Kinetic Strike Boot Animation (Compositor Optimized) ══════════ */
 :root {
-  --volt: #D6FF3F;
-  --volt-hi: #EDFFB3;
-  --ink: #FFFFFF;
-  --dim: #93A084;
-  --boot-bg: #060905;
-
-  /* timeline anchors */
-  --t-fly: 60ms;
-  --t-impact: 400ms;
-  --t-strike: 560ms;
-  --t-word: 860ms;
-  --t-exit: 2100ms;
+  --bg: #000000;
+  --lime: #D6FF3F;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --hit: cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
-#boot {
+.splash {
   position: fixed;
   inset: 0;
+  background: #000000;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 42%;
   z-index: 999999;
-  background: var(--boot-bg);
-  contain: layout style;
-  pointer-events: none;
-}
-#boot.boot--done { opacity: 0; transition: opacity .18s linear; }
-
-.scene {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(16px, 4vw, 26px);
-  padding-bottom: 5vh;
-  transform-origin: 50% 44%;
   will-change: transform, opacity;
   backface-visibility: hidden;
-  animation: scene-exit 700ms var(--t-exit) cubic-bezier(.65, .05, .9, .4) both;
 }
 
-@keyframes scene-exit {
-  0%   { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.62); opacity: 0; }
+/* Replaced feTurbulence & mix-blend-mode with zero-cost transparent layer */
+.splash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  opacity: 0;
+  pointer-events: none;
+  background: transparent;
 }
 
-.shake {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(16px, 4vw, 26px);
-  will-change: transform;
-  backface-visibility: hidden;
-  animation: shake 380ms var(--t-impact) both,
-             shake2 220ms 780ms cubic-bezier(.2, .7, .3, 1) forwards;
-}
-
-@keyframes shake {
-  0%   { transform: translate3d(0, 0, 0); }
-  14%  { transform: translate3d(-11px, 5px, 0); }
-  28%  { transform: translate3d(9px, -5px, 0); }
-  42%  { transform: translate3d(-7px, 3px, 0); }
-  56%  { transform: translate3d(5px, -3px, 0); }
-  70%  { transform: translate3d(-3px, 2px, 0); }
-  84%  { transform: translate3d(2px, -1px, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-@keyframes shake2 {
-  0%   { transform: translate3d(-4px, 2px, 0); }
-  30%  { transform: translate3d(4px, -2px, 0); }
-  60%  { transform: translate3d(-2px, 1px, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-.zone {
+.stage {
   position: relative;
-  width: clamp(160px, 48vw, 240px);
-  aspect-ratio: 1;
-  flex: none;
+  width: min(72vw, 320px);
+  height: min(88vh, 560px);
 }
 
-.half {
+.flash,
+.flash2 {
   position: absolute;
-  inset: 0;
-  transform-origin: 50% 50%;
-  will-change: transform;
-  backface-visibility: hidden;
-}
-.half svg, .tri-wrap svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.half--l {
-  animation: slam-l 340ms var(--t-fly) both,
-            squash 340ms var(--t-impact) cubic-bezier(.3, 1.5, .45, 1) forwards,
-            half-exit-l 700ms var(--t-exit) cubic-bezier(.6, .05, .9, .4) forwards;
-}
-.half--r {
-  animation: slam-r 340ms var(--t-fly) both,
-            squash 340ms var(--t-impact) cubic-bezier(.3, 1.5, .45, 1) forwards,
-            half-exit-r 700ms var(--t-exit) cubic-bezier(.6, .05, .9, .4) forwards;
-}
-
-.tri-wrap {
-  position: absolute;
-  inset: 0;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  animation: tri-ignite 480ms var(--t-impact) cubic-bezier(.16, 1, .3, 1) both;
-}
-
-@keyframes tri-ignite {
-  0%   { opacity: 0; transform: scale(0.15) translate3d(0, -8px, 0); }
-  32%  { opacity: 1; transform: scale(1.35) translate3d(0, 0, 0); }
-  48%  { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
-  100% { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
-}
-
-@keyframes slam-l {
-  0%   { transform: translate3d(-120vw, 0, 0) skewX(-16deg); animation-timing-function: cubic-bezier(.62, .02, .9, .42); }
-  100% { transform: translate3d(0, 0, 0) skewX(0deg); }
-}
-@keyframes slam-r {
-  0%   { transform: translate3d(120vw, 0, 0) skewX(16deg); animation-timing-function: cubic-bezier(.62, .02, .9, .42); }
-  100% { transform: translate3d(0, 0, 0) skewX(0deg); }
-}
-@keyframes squash {
-  0%   { transform: scale(.9, 1.1); }
-  100% { transform: scale(1, 1); }
-}
-@keyframes half-exit-l {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-52%, 0, 0); }
-}
-@keyframes half-exit-r {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(52%, 0, 0); }
-}
-
-.tail {
-  position: absolute;
-  top: 28%;
-  bottom: 32%;
-  width: 46vw;
+  inset: -200vh -200vw;
   opacity: 0;
-  will-change: opacity;
-}
-.half--l .tail {
-  right: 48%;
-  background: linear-gradient(90deg, transparent, rgba(214, 255, 63, .5));
-  animation: tail 360ms var(--t-fly) both;
-}
-.half--r .tail {
-  left: 48%;
-  background: linear-gradient(270deg, transparent, rgba(214, 255, 63, .5));
-  animation: tail 360ms var(--t-fly) both;
-}
-@keyframes tail {
-  0%   { opacity: .95; }
-  80%  { opacity: .95; }
-  100% { opacity: 0; }
-}
-
-.aura {
-  position: absolute;
-  inset: -30% -36%;
-  border-radius: 50%;
-  opacity: 0;
-  background: radial-gradient(closest-side, rgba(214, 255, 63, .32), rgba(214, 255, 63, .10) 45%, transparent 72%);
-  will-change: transform, opacity;
-  animation: aura 650ms var(--t-impact) cubic-bezier(.2, .8, .3, 1) both;
-}
-@keyframes aura {
-  0%   { transform: scale(.55); opacity: 0; }
-  30%  { opacity: .9; }
-  100% { transform: scale(1); opacity: .55; }
-}
-
-.burst {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(72vw, 340px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  opacity: 0;
-  will-change: transform, opacity;
-  background: radial-gradient(closest-side, #FBFFDD 0%, var(--volt) 26%, rgba(214, 255, 63, .28) 55%, transparent 74%);
-  animation: burst 520ms var(--t-impact) cubic-bezier(.16, .84, .44, 1) both;
-}
-@keyframes burst {
-  0%   { transform: translate(-50%, -50%) scale(.12); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
-}
-
-.ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(60vw, 280px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 2.5px solid var(--volt);
-  opacity: 0;
-  will-change: transform, opacity;
-}
-.ring--1 { --s: 2.3; animation: ring 620ms var(--t-impact) cubic-bezier(.17, .9, .3, 1) both; }
-.ring--2 { --s: 2.8; border-width: 2px; animation: ring 760ms 428ms cubic-bezier(.17, .9, .3, 1) both; }
-.ring--3 { --s: 3.3; border-width: 1.5px; animation: ring 900ms 462ms cubic-bezier(.17, .9, .3, 1) both; }
-
-@keyframes ring {
-  0%   { transform: translate(-50%, -50%) scale(.14) scaleY(.55); opacity: .95; }
-  100% { transform: translate(-50%, -50%) scale(var(--s)) scaleY(.55); opacity: 0; }
-}
-
-.streak {
-  position: absolute;
-  top: calc(50% + var(--y));
-  left: 50%;
-  width: var(--w);
-  height: var(--h, 2px);
-  margin-left: calc(var(--w) / -2);
-  opacity: 0;
-  will-change: transform, opacity;
-  background: linear-gradient(90deg, transparent, rgba(214, 255, 63, .95), transparent);
-  animation: streak var(--d) var(--dl) cubic-bezier(.12, .75, .25, 1) both;
-}
-@keyframes streak {
-  0%   { transform: translate3d(calc(var(--dir) * -6vw), 0, 0) scaleX(.25); opacity: 0; }
-  12%  { opacity: 1; }
-  100% { transform: translate3d(calc(var(--dir) * 54vw), 0, 0) scaleX(1.3); opacity: 0; }
-}
-
-
-.ghost {
-  position: absolute;
-  left: -15%;
-  right: -15%;
-  top: 0;
-  bottom: 0;
-  opacity: 0;
-  will-change: opacity;
   pointer-events: none;
-  animation: ghost 700ms var(--t-exit) linear both;
+  will-change: opacity;
+  backface-visibility: hidden;
 }
-.ghost svg {
+/* Replaced mix-blend-mode: overlay/screen with standard alpha layers */
+.flash { background: #fff; }
+.flash2 { background: var(--lime); }
+
+.impact-line {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: -40vh;
+  height: 140vh;
+  width: 1px;
+  background: var(--lime);
+  transform: translate3d(-50%, 0, 0) scale3d(1, 0, 1);
+  transform-origin: 50% 42%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.trailL, .trailR {
+  position: absolute;
+  top: 42%;
+  height: 2px;
+  width: 42vw;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+.trailL {
+  right: 50%;
+  background: linear-gradient(90deg, transparent, #fff);
+  transform-origin: 100% 50%;
+  transform: scale3d(0, 1, 1);
+}
+.trailR {
+  left: 50%;
+  background: linear-gradient(90deg, #fff, transparent);
+  transform-origin: 0% 50%;
+  transform: scale3d(0, 1, 1);
+}
+
+.ring, .ring2, .ring3 {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border: 1px solid rgba(214,255,63,0.85);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale3d(0.2, 0.2, 1);
+  opacity: 0;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.stack {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: min(56vw, 220px);
+  height: min(56vw, 220px);
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+.stack svg {
   width: 100%;
   height: 100%;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
 }
-@keyframes ghost {
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
+
+/* GPU-friendly drop-shadow replacement via radial gradient */
+.stack::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 1);
+  background: radial-gradient(circle, rgba(214,255,63,0.7) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  z-index: 0;
 }
+
+.left { transform-box: fill-box; transform-origin: 100% 50%; will-change: transform, opacity; backface-visibility: hidden; }
+.right { transform-box: fill-box; transform-origin: 0% 50%; will-change: transform, opacity; backface-visibility: hidden; }
+.tri { transform-box: fill-box; transform-origin: 50% 0%; will-change: transform, opacity; backface-visibility: hidden; }
 
 .word {
+  position: absolute;
+  left: 0; right: 0;
+  top: 68%;
   display: flex;
-  gap: .02em;
-  color: var(--ink);
-  font-size: clamp(44px, 14vw, 76px);
-  line-height: .94;
+  justify-content: center;
   font-weight: 900;
-  letter-spacing: 0.2em;
-  text-indent: 0.2em;
+  font-size: clamp(36px, 11vw, 56px);
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: #ffffff;
 }
-.word b {
+.word span {
   display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 28px, 0) scale3d(0.84, 0.84, 1);
   will-change: transform, opacity;
-  animation: punch 210ms calc(var(--t-word) + var(--i) * 70ms) cubic-bezier(.16, 1, .3, 1) both;
-}
-@keyframes punch {
-  0%   { transform: translate3d(0, .4em, 0) scale(1.9) skewX(-12deg); opacity: 0; }
-  40%  { opacity: 1; }
-  100% { transform: translate3d(0, 0, 0) scale(1) skewX(0deg); opacity: 1; }
-}
-
-.rule {
-  width: clamp(54px, 16vw, 84px);
-  height: 2px;
-  background: var(--volt);
-  transform-origin: 0 50%;
-  will-change: transform;
-  animation: rule 480ms calc(var(--t-word) + 420ms) cubic-bezier(.2, .9, .2, 1) both;
-}
-@keyframes rule {
-  0%   { transform: scaleX(0); }
-  100% { transform: scaleX(1); }
+  backface-visibility: hidden;
 }
 
 .sub {
-  color: var(--dim);
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: clamp(10px, 3vw, 13px);
-  text-transform: uppercase;
-  letter-spacing: .52em;
-  text-indent: .52em;
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(68% + 58px);
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(10px, 2.6vw, 12px);
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  color: var(--lime);
   opacity: 0;
+  transform: translate3d(0, -10px, 0) scale3d(1.15, 1, 1);
   will-change: transform, opacity;
-  animation: sub 520ms calc(var(--t-word) + 460ms) cubic-bezier(.2, .8, .2, 1) both;
-}
-@keyframes sub {
-  0%   { transform: translate3d(0, 12px, 0); opacity: 0; }
-  100% { transform: translate3d(0, 0, 0); opacity: .85; }
+  backface-visibility: hidden;
 }
 
-.flash {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  will-change: opacity;
-  background: radial-gradient(120% 85% at 50% 44%, #F6FFD2 0%, #D9FF3E 30%, rgba(214, 255, 63, .22) 55%, transparent 74%);
-  animation: flash 340ms calc(var(--t-impact) - 10ms) linear both;
+.play .left { animation: slamL 2.8s var(--hit) forwards; }
+.play .right { animation: slamR 2.8s var(--hit) forwards; }
+.play .tri { animation: ignite 2.8s var(--hit) forwards; }
+.play .stack::after { animation: igniteGlow 2.8s var(--hit) forwards; }
+.play .flash { animation: flash 2.8s linear forwards; }
+.play .flash2 { animation: flashLime 2.8s linear forwards; }
+.play .ring { animation: shock 2.8s var(--ease) forwards; }
+.play .ring2 { animation: shock 2.8s 0.06s var(--ease) forwards; }
+.play .ring3 { animation: shock 2.8s 0.12s var(--ease) forwards; }
+.play .trailL, .play .trailR { animation: trail 2.8s var(--ease) forwards; }
+.play .word span { animation: punch 2.8s var(--ease) forwards; }
+.play .word span:nth-child(2) { animation-delay: 0.03s; }
+.play .word span:nth-child(3) { animation-delay: 0.06s; }
+.play .word span:nth-child(4) { animation-delay: 0.09s; }
+.play .sub { animation: subIn 2.8s var(--ease) forwards; }
+.play .impact-line { animation: line 2.8s var(--ease) forwards; }
+.play .stack { animation: stackHold 2.8s var(--ease) forwards; }
+.play.splash { animation: zoomOut 2.8s cubic-bezier(0.77, 0, 0.18, 1) forwards; }
+
+@keyframes slamL {
+  0% { transform: translate(-86px, -8px) rotate(-18deg); opacity: 0; }
+  8% { opacity: 1; }
+  22% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  26% { transform: translate(3px, 0) rotate(1deg); }
+  32% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(0, 0) rotate(0); opacity: 1; }
+}
+@keyframes slamR {
+  0% { transform: translate(86px, -8px) rotate(18deg); opacity: 0; }
+  8% { opacity: 1; }
+  22% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  26% { transform: translate(-3px, 0) rotate(-1deg); }
+  32% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(0, 0) rotate(0); opacity: 1; }
+}
+@keyframes ignite {
+  0%, 24% { opacity: 0; transform: scale(0.15) translateY(-8px); }
+  32% { opacity: 1; transform: scale(1.35) translateY(0); }
+  40% { transform: scale(0.92) translateY(0); }
+  48% { transform: scale(1) translateY(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes igniteGlow {
+  0%, 24% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(0.5, 0.5, 1); }
+  32% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(2, 2, 1); }
+  40% { transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1); }
+  48% { transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1); }
+  100% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1); }
 }
 @keyframes flash {
-  0%   { opacity: 0; }
-  7%   { opacity: 1; }
-  20%  { opacity: .25; }
-  34%  { opacity: .7; }
+  0%, 20% { opacity: 0; }
+  22% { opacity: 0.85; }
+  28% { opacity: 0; }
   100% { opacity: 0; }
 }
-
-.boot-grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  z-index: 9;
-  pointer-events: none;
-  background-repeat: repeat;
-  background-size: 96px 96px;
-  will-change: opacity;
-  animation: grain 900ms calc(var(--t-impact) + 500ms) linear both;
+@keyframes flashLime {
+  0%, 22% { opacity: 0; }
+  24% { opacity: 0.35; }
+  34% { opacity: 0; }
+  100% { opacity: 0; }
 }
-@keyframes grain {
-  0%   { opacity: 0; }
-  100% { opacity: .08; }
+@keyframes shock {
+  0%, 21% { transform: scale3d(0.2, 0.2, 1); opacity: 0; }
+  22% { opacity: 1; }
+  55% { transform: scale3d(9, 9, 1); opacity: 0; }
+  100% { transform: scale3d(9, 9, 1); opacity: 0; }
+}
+@keyframes trail {
+  0% { transform: scale3d(0, 1, 1); opacity: 0; }
+  6% { opacity: 0.9; }
+  20% { transform: scale3d(1, 1, 1); opacity: 0; }
+  100% { transform: scale3d(1, 1, 1); opacity: 0; }
+}
+@keyframes punch {
+  0%, 38% { opacity: 0; transform: translate3d(0, 28px, 0) scale3d(0.84, 0.84, 1); }
+  52% { opacity: 1; transform: translate3d(0, -4px, 0) scale3d(1.04, 1.04, 1); }
+  60%, 72% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
+  88%, 100% { opacity: 0; transform: translate3d(0, 12px, 0) scale3d(0.95, 0.95, 1); }
+}
+@keyframes subIn {
+  0%, 48% { opacity: 0; transform: translate3d(0, -10px, 0) scale3d(1.15, 1, 1); }
+  62%, 72% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
+  88%, 100% { opacity: 0; transform: translate3d(0, 8px, 0) scale3d(1.05, 1, 1); }
+}
+@keyframes line {
+  0% { transform: translate3d(-50%, 0, 0) scale3d(1, 0, 1); opacity: 0; }
+  10% { transform: translate3d(-50%, 0, 0) scale3d(1, 1, 1); opacity: 0.55; }
+  26% { opacity: 0; transform: translate3d(-50%, 0, 0) scale3d(1, 1, 1); }
+  100% { opacity: 0; }
+}
+@keyframes stackHold {
+  0%, 72% { transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1); opacity: 1; }
+  88% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1); }
+  100% { transform: translate3d(-50%, -50%, 0) scale3d(1.35, 1.35, 1); opacity: 0; }
+}
+@keyframes zoomOut {
+  0%, 72% { opacity: 1; transform: translate3d(0,0,0) scale3d(1, 1, 1); }
+  88% { opacity: 0; transform: translate3d(0,0,0) scale3d(1.28, 1.28, 1); }
+  100% { opacity: 0; transform: translate3d(0,0,0) scale3d(1.4, 1.4, 1); visibility: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #boot, #boot * { animation: none !important; }
-  #boot.boot--done { transition: none; }
+  .splash.play, .splash.play * {
+    animation-duration: 0.4s !important;
+    animation-delay: 0s !important;
+  }
 }
 
 </style>
 </head>
 <body>
-<div id="boot" aria-hidden="true">
-  <div class="scene">
-    <div class="shake">
-      <div class="zone">
-        <!-- pre-baked light -->
-        <div class="aura"></div>
-        <div class="burst"></div>
-        <div class="ring ring--1"></div>
-        <div class="ring ring--2"></div>
-        <div class="ring ring--3"></div>
-
-        <!-- blowout streaks -->
-        <i class="streak" style="--y:-42px; --w:190px; --dir:-1; --d:560ms; --dl:396ms"></i>
-        <i class="streak" style="--y:-12px; --w:260px; --h:3px; --dir:-1; --d:660ms; --dl:402ms"></i>
-        <i class="streak" style="--y: 28px; --w:150px; --dir:-1; --d:500ms; --dl:408ms"></i>
-        <i class="streak" style="--y:-42px; --w:190px; --dir: 1; --d:560ms; --dl:396ms"></i>
-        <i class="streak" style="--y:-12px; --w:260px; --h:3px; --dir: 1; --d:660ms; --dl:402ms"></i>
-        <i class="streak" style="--y: 28px; --w:150px; --dir: 1; --d:500ms; --dl:408ms"></i>
-
-        <!-- monogram halves: transform lives on the WRAPPER div -->
-        <div class="half half--l">
-          <i class="tail"></i>
-          <svg viewBox="0 0 108 108"><path fill="#FFFFFF" d="M 28 28 L 44 28 L 54 48 L 54 64 L 46 64 Z"/></svg>
-        </div>
-        <div class="half half--r">
-          <i class="tail"></i>
-          <svg viewBox="0 0 108 108"><path fill="#FFFFFF" d="M 64 28 L 80 28 L 62 64 L 54 64 L 54 48 Z"/></svg>
-        </div>
-        <div class="tri-wrap">
-          <svg viewBox="0 0 108 108"><path fill="#D6FF3F" d="M 49 70 L 59 70 L 54 80 Z"/></svg>
-        </div>
-        <!-- static-blur ghost for the defocus exit -->
-        <div class="ghost">
-          <svg viewBox="0 0 108 108">
-            <defs>
-              <filter id="vb" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="6"/>
-              </filter>
-            </defs>
-            <g filter="url(#vb)">
-              <path fill="#FFFFFF" d="M 28 28 L 44 28 L 54 48 L 54 64 L 46 64 Z"/>
-              <path fill="#FFFFFF" d="M 64 28 L 80 28 L 62 64 L 54 64 L 54 48 Z"/>
-              <path fill="#D6FF3F" d="M 49 70 L 59 70 L 54 80 Z"/>
-            </g>
-          </svg>
-        </div>
-      </div>
-
-      <div class="word" aria-label="VANT">
-        <b style="--i:0">V</b><b style="--i:1">A</b><b style="--i:2">N</b><b style="--i:3">T</b>
-      </div>
-      <div class="rule"></div>
-      <div class="sub">Strength OS</div>
+<div class="splash play" id="splash">
+  <div class="stage">
+    <div class="impact-line"></div>
+    <div class="trailL"></div>
+    <div class="trailR"></div>
+    <div class="ring"></div>
+    <div class="ring2"></div>
+    <div class="ring3"></div>
+    <div class="stack">
+      <svg viewBox="0 0 108 108">
+        <path class="left" fill="#fff" d="M 28 28 L 44 28 L 54 48 L 54 64 L 46 64 Z" />
+        <path class="right" fill="#fff" d="M 64 28 L 80 28 L 62 64 L 54 64 L 54 48 Z" />
+        <path class="tri" fill="#D6FF3F" d="M 49 70 L 59 70 L 54 80 Z" />
+      </svg>
     </div>
-
-    <div class="flash"></div>
-    <div class="boot-grain"></div>
+    <div class="word"><span>V</span><span>A</span><span>N</span><span>T</span></div>
+    <div class="sub">STRENGTH OS</div>
   </div>
+  <div class="flash"></div>
+  <div class="flash2"></div>
 </div>
 <div class="grain"></div>
 <div class="app" id="app">
@@ -9824,53 +9723,23 @@ body.history-multi-mode .hist-checkbox {
   const content = document.getElementById("content");
   if (content) decorate(content);
 
-  // Compositor-Driven Kinetic Strike Boot Splash lifecycle
+  // Kinetic Strike Boot Splash lifecycle
   (function initBootSplash() {
-    const boot = document.getElementById("boot");
-    if (!boot) return;
+    const splash = document.getElementById("splash");
+    if (!splash) return;
 
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const END = 2800, PAD = 400;
-
-    // Generate 96x96 noise texture tile once into grain background
-    try {
-      const gc = document.createElement("canvas");
-      gc.width = gc.height = 96;
-      const g = gc.getContext("2d");
-      const id = g.createImageData(96, 96);
-      for (let i = 0; i < id.data.length; i += 4) {
-        const v = (Math.random() * 255) | 0;
-        id.data[i] = id.data[i+1] = id.data[i+2] = v;
-        id.data[i+3] = 255;
+    splash.addEventListener("animationend", (e) => {
+      if (e.animationName === "zoomOut") {
+        splash.style.display = "none";
       }
-      g.putImageData(id, 0, 0);
-      const grainEl = boot.querySelector(".boot-grain");
-      if (grainEl) grainEl.style.backgroundImage = `url(${gc.toDataURL()})`;
-    } catch (_) {}
+    });
 
-    // Teardown handler
-    let finished = false;
-    function finish() {
-      if (finished) return;
-      finished = true;
-      boot.classList.add("boot--done");
-      setTimeout(() => {
-        boot.remove();
-        document.dispatchEvent(new CustomEvent("vant:bootend"));
-      }, 200);
-    }
-
-    if (reduced) {
-      setTimeout(finish, 400);
-    } else {
-      const scene = boot.querySelector(".scene");
-      if (scene) {
-        scene.addEventListener("animationend", (e) => {
-          if (e.animationName === "scene-exit") finish();
-        });
+    // Fallback: hide after animation duration (2.8s + safety padding)
+    setTimeout(() => {
+      if (splash && splash.style.display !== "none") {
+        splash.style.display = "none";
       }
-      setTimeout(finish, END + PAD);
-    }
+    }, 3200);
   })();
 })();
 </script>
