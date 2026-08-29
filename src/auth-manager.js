@@ -10,6 +10,8 @@ import {
   signOut,
   updateProfile,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInAnonymously, 
   onAuthStateChanged,
   GoogleAuthProvider, 
@@ -25,6 +27,16 @@ export class AuthManager {
   }
 
   async initializeAuth() {
+    try {
+      const redirectResult = await getRedirectResult(this.auth);
+      if (redirectResult && redirectResult.user) {
+        this.currentUser = redirectResult.user;
+        this.notifyListeners(redirectResult.user);
+      }
+    } catch (err) {
+      console.warn('[VANT Auth] Redirect result error:', err);
+    }
+
     return new Promise((resolve) => {
       onAuthStateChanged(this.auth, async (user) => {
         this.currentUser = user;
@@ -75,15 +87,23 @@ export class AuthManager {
   }
 
   async signInWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
     try {
-      const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(this.auth, provider);
       this.currentUser = cred.user;
       this.notifyListeners(cred.user);
       return { user: cred.user };
     } catch (err) {
-      console.error('[VANT Auth] Google sign in error:', err);
-      throw err;
+      console.warn('[VANT Auth] Popup sign-in fallback to redirect:', err);
+      try {
+        await signInWithRedirect(this.auth, provider);
+        return { redirect: true };
+      } catch (redirectErr) {
+        console.error('[VANT Auth] Redirect sign-in error:', redirectErr);
+        throw redirectErr;
+      }
     }
   }
 
