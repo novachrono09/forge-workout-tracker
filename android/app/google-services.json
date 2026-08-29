@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "462534748948",
+    "project_id": "vant-strength-os",
+    "storage_bucket": "vant-strength-os.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462534748948:android:3309d29abd2c14afd9f001",
+        "android_client_info": {
+          "package_name": "com.forge.strengthos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOh9Mv6I-gSIYRxRMCothQuwV8iOqkT1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

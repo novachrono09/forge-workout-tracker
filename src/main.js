@@ -3,6 +3,7 @@ import { HapticEngine, KeepAwake } from './native/forge-device';
 import { RestTimer } from './native/rest-timer';
 import { initNativeChrome, hideSplash } from './native/chrome';
 import { initBackHandler } from './native/back-button';
+import { FirebaseCloud } from './firebase-cloud';
 
 // Bridge Native Haptics to FORGE window.Haptics
 window.Haptics = {
