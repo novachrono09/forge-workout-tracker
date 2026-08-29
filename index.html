@@ -4038,7 +4038,7 @@ body.history-multi-mode .hist-checkbox {
 .word span {
   display: inline-block;
   opacity: 0;
-  transform: translate3d(0, 28px, 0) scale3d(0.84, 0.84, 1);
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
@@ -4046,15 +4046,16 @@ body.history-multi-mode .hist-checkbox {
 .sub {
   position: absolute;
   left: 0; right: 0;
-  top: calc(68% + 58px);
+  top: calc(68% + 68px);
   text-align: center;
   font-family: "JetBrains Mono", monospace;
-  font-size: clamp(10px, 2.6vw, 12px);
-  letter-spacing: 0.5em;
-  text-indent: 0.5em;
+  font-weight: 800;
+  font-size: clamp(11px, 2.8vw, 13.5px);
+  letter-spacing: 0.52em;
+  text-indent: 0.52em;
   color: var(--lime);
   opacity: 0;
-  transform: translate3d(0, -10px, 0) scale3d(1.15, 1, 1);
+  text-shadow: 0 0 12px rgba(214, 255, 63, 0.45);
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
@@ -4083,7 +4084,7 @@ body.history-multi-mode .hist-checkbox {
   8% { opacity: 1; }
   22% { transform: translate(0, 0) rotate(0); opacity: 1; }
   26% { transform: translate(3px, 0) rotate(1deg); }
-  32% { transform: translate(0, 0) rotate(0); }
+  32% { transform: translate(0, 0) rotate(0); opacity: 1; }
   100% { transform: translate(0, 0) rotate(0); opacity: 1; }
 }
 @keyframes slamR {
@@ -4091,14 +4092,14 @@ body.history-multi-mode .hist-checkbox {
   8% { opacity: 1; }
   22% { transform: translate(0, 0) rotate(0); opacity: 1; }
   26% { transform: translate(-3px, 0) rotate(-1deg); }
-  32% { transform: translate(0, 0) rotate(0); }
+  32% { transform: translate(0, 0) rotate(0); opacity: 1; }
   100% { transform: translate(0, 0) rotate(0); opacity: 1; }
 }
 @keyframes ignite {
   0%, 24% { opacity: 0; transform: scale(0.15) translateY(-8px); }
   32% { opacity: 1; transform: scale(1.35) translateY(0); }
   40% { transform: scale(0.92) translateY(0); }
-  48% { transform: scale(1) translateY(0); }
+  48% { transform: scale(1) translateY(0); opacity: 1; }
   100% { opacity: 1; transform: scale(1); }
 }
 @keyframes igniteGlow {
@@ -4135,13 +4136,11 @@ body.history-multi-mode .hist-checkbox {
 @keyframes punch {
   0%, 38% { opacity: 0; transform: translate3d(0, 28px, 0) scale3d(0.84, 0.84, 1); }
   52% { opacity: 1; transform: translate3d(0, -4px, 0) scale3d(1.04, 1.04, 1); }
-  60%, 72% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
-  88%, 100% { opacity: 0; transform: translate3d(0, 12px, 0) scale3d(0.95, 0.95, 1); }
+  60%, 100% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
 }
 @keyframes subIn {
-  0%, 48% { opacity: 0; transform: translate3d(0, -10px, 0) scale3d(1.15, 1, 1); }
-  62%, 72% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
-  88%, 100% { opacity: 0; transform: translate3d(0, 8px, 0) scale3d(1.05, 1, 1); }
+  0%, 48% { opacity: 0; transform: translate3d(0, 10px, 0); }
+  62%, 100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes line {
   0% { transform: translate3d(-50%, 0, 0) scale3d(1, 0, 1); opacity: 0; }
