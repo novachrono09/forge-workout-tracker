@@ -5,3 +5,4 @@ dist/
 keystore.properties
 .DS_Store
 build/
+apk/
