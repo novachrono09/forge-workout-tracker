@@ -107,7 +107,17 @@ export class AuthManager {
     // If running in Native Capacitor Android APK, trigger Native Google Sign-In Sheet
     if (Capacitor.isNativePlatform()) {
       try {
-        const result = await FirebaseAuthentication.signInWithGoogle();
+        let result;
+        try {
+          result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: true });
+        } catch (cmErr) {
+          const cmMsg = (cmErr?.message || '').toLowerCase();
+          if (cmMsg.includes('cancel') || cmMsg.includes('16') || cmMsg.includes('12501')) {
+            throw cmErr;
+          }
+          console.warn('[VANT Auth] CredentialManager error, trying GoogleSignIn fallback:', cmErr);
+          result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
+        }
         const idToken = result?.credential?.idToken || result?.idToken;
         if (idToken) {
           const credential = GoogleAuthProvider.credential(idToken);
