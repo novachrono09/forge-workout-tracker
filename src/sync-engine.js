@@ -7,6 +7,7 @@ import {
   getFirestore, 
   writeBatch, 
   doc, 
+  getDoc,
   collection, 
   query, 
   where, 
@@ -23,6 +24,8 @@ export class SyncEngine {
     this.firestore = getFirestore(firebaseApp);
     this.authManager = authManager;
     this.isSyncing = false;
+    this.syncDebounceTimer = null;
+    this.latestPendingState = null;
     this.initIDB();
     this.registerNetworkListeners();
   }
@@ -250,6 +253,172 @@ export class SyncEngine {
       console.log(`[VANT Sync] Synced ${snapshot.size} remote workout deltas.`);
     } catch (err) {
       console.warn('[VANT Sync] Delta pull failed:', err);
+    }
+  }
+
+  /**
+   * Sync complete VANT state with debounced cloud backup
+   */
+  async syncState(state) {
+    if (!state) return;
+    this.latestPendingState = state;
+
+    // Always persist to IndexedDB as an additional offline replica
+    this.saveStateLocally(state).catch(() => {});
+
+    // Debounce cloud write by 1 second to avoid rapid write bursts
+    if (this.syncDebounceTimer) {
+      clearTimeout(this.syncDebounceTimer);
+    }
+
+    this.syncDebounceTimer = setTimeout(() => {
+      this.pushStateToCloud(this.latestPendingState).catch((err) => {
+        console.warn('[VANT Sync] Debounced push error:', err);
+      });
+    }, 1000);
+  }
+
+  /**
+   * Force immediate flush of pending state (e.g. before unload or on session save)
+   */
+  async flushSync() {
+    if (this.syncDebounceTimer) {
+      clearTimeout(this.syncDebounceTimer);
+      this.syncDebounceTimer = null;
+    }
+    if (this.latestPendingState) {
+      await this.pushStateToCloud(this.latestPendingState);
+    }
+  }
+
+  /**
+   * Push full state payload and individual workouts to Firestore
+   */
+  async pushStateToCloud(state) {
+    const user = this.authManager.getCurrentUser();
+    if (!user || user.isAnonymous) return;
+
+    if (!navigator.onLine) {
+      console.log('[VANT Sync] Offline — state queued for reconnect');
+      return;
+    }
+
+    try {
+      const statePayload = {
+        version: state.version || 1,
+        onboarded: state.onboarded ?? true,
+        profile: state.profile || {},
+        routine: state.routine || {},
+        customEx: state.customEx || [],
+        workouts: (state.workouts || []).slice(0, 1000),
+        body: state.body || [],
+        measures: state.measures || [],
+        notes: state.notes || [],
+        prefs: state.prefs || {},
+        updatedAt: Date.now()
+      };
+
+      const ref = doc(this.firestore, `users/${user.uid}/data/state`);
+      await setDoc(ref, statePayload, { merge: true });
+
+      // Also ensure recent completed workouts are individual documents for queries
+      if (Array.isArray(state.workouts) && state.workouts.length > 0) {
+        const batch = writeBatch(this.firestore);
+        const recent = state.workouts.slice(-20);
+        for (const wo of recent) {
+          if (wo && wo.id) {
+            const wRef = doc(this.firestore, `users/${user.uid}/workouts/${wo.id}`);
+            batch.set(wRef, { ...wo, updatedAt: wo.updatedAt || Date.now() }, { merge: true });
+          }
+        }
+        await batch.commit().catch(() => {});
+      }
+
+      console.log('[VANT Sync] Cloud state backup successful.');
+    } catch (err) {
+      console.error('[VANT Sync] Cloud push failed:', err);
+    }
+  }
+
+  /**
+   * Restore cloud state and merge with local state
+   */
+  async pullAndMergeState(localState) {
+    const user = this.authManager.getCurrentUser();
+    if (!user || user.isAnonymous) return localState;
+
+    try {
+      const ref = doc(this.firestore, `users/${user.uid}/data/state`);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) {
+        // Initial sync: Upload local state to Firestore
+        console.log('[VANT Sync] No existing cloud backup. Uploading local state.');
+        await this.pushStateToCloud(localState);
+        return localState;
+      }
+
+      const remote = snap.data();
+      console.log('[VANT Sync] Restoring and merging remote cloud state.');
+
+      // Merge workouts by unique ID
+      const workoutMap = new Map();
+      (localState.workouts || []).forEach(w => { if (w && w.id) workoutMap.set(w.id, w); });
+      (remote.workouts || []).forEach(w => {
+        if (w && w.id) {
+          const localW = workoutMap.get(w.id);
+          if (!localW || (w.ended || 0) >= (localW.ended || 0)) {
+            workoutMap.set(w.id, w);
+          }
+        }
+      });
+
+      // Merge custom exercises by ID
+      const exMap = new Map();
+      (localState.customEx || []).forEach(e => { if (e && e.id) exMap.set(e.id, e); });
+      (remote.customEx || []).forEach(e => { if (e && e.id) exMap.set(e.id, e); });
+
+      // Merge body weigh-ins by date
+      const bodyMap = new Map();
+      (localState.body || []).forEach(b => { if (b && b.date) bodyMap.set(b.date, b); });
+      (remote.body || []).forEach(b => { if (b && b.date) bodyMap.set(b.date, b); });
+
+      // Merge measures by date
+      const measureMap = new Map();
+      (localState.measures || []).forEach(m => { if (m && m.date) measureMap.set(m.date, m); });
+      (remote.measures || []).forEach(m => { if (m && m.date) measureMap.set(m.date, m); });
+
+      const mergedState = {
+        ...localState,
+        version: Math.max(localState.version || 1, remote.version || 1),
+        onboarded: localState.onboarded || remote.onboarded || true,
+        profile: { ...(remote.profile || {}), ...(localState.profile || {}) },
+        routine: (remote.routine && Object.keys(remote.routine.days || {}).length > 0) ? remote.routine : localState.routine,
+        customEx: Array.from(exMap.values()),
+        workouts: Array.from(workoutMap.values()).sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.started || 0) - (b.started || 0)),
+        body: Array.from(bodyMap.values()).sort((a, b) => (a.date || '').localeCompare(b.date || '')),
+        measures: Array.from(measureMap.values()).sort((a, b) => (a.date || '').localeCompare(b.date || '')),
+        notes: Array.isArray(remote.notes) && remote.notes.length > (localState.notes?.length || 0) ? remote.notes : (localState.notes || []),
+        prefs: { ...(remote.prefs || {}), ...(localState.prefs || {}) }
+      };
+
+      this.saveStateLocally(mergedState).catch(() => {});
+      return mergedState;
+    } catch (err) {
+      console.error('[VANT Sync] pullAndMergeState error:', err);
+      return localState;
+    }
+  }
+
+  async saveStateLocally(state) {
+    try {
+      const db = await this.initIDB();
+      const tx = db.transaction(['profile'], 'readwrite');
+      const profileStore = tx.objectStore('profile');
+      profileStore.put({ id: 'current_user_profile', ...state.profile, updatedAt: Date.now() });
+      tx.oncomplete = () => {};
+    } catch (e) {
+      // safe ignore IDB warnings
     }
   }
 }

@@ -2,47 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAuthenticated() {
-      return request.auth != null && request.auth.uid != null;
-    }
-
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    function validTimestamp(ts) {
-      return ts is number && ts > 0;
-    }
-
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId) 
-                    && request.resource.data.keys().hasAll(['preferences', 'createdAt', 'updatedAt'])
-                    && validTimestamp(request.resource.data.createdAt);
-      allow update: if isOwner(userId) 
-                    && validTimestamp(request.resource.data.updatedAt)
-                    && request.resource.data.createdAt == resource.data.createdAt;
-      allow delete: if false; // Disallow full profile drops via client
+      allow read, write: if request.auth != null && request.auth.uid == userId;
 
-      match /templates/{templateId} {
-        allow read: if isOwner(userId);
-        allow create, update: if isOwner(userId)
-                              && request.resource.data.name is string
-                              && request.resource.data.name.size() > 0
-                              && request.resource.data.name.size() <= 100
-                              && validTimestamp(request.resource.data.updatedAt);
-        allow delete: if isOwner(userId);
-      }
-
-      match /workouts/{workoutId} {
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId)
-                      && request.resource.data.id == workoutId
-                      && request.resource.data.exercises is list
-                      && validTimestamp(request.resource.data.startTime);
-        allow update: if isOwner(userId)
-                      && validTimestamp(request.resource.data.updatedAt);
-        allow delete: if isOwner(userId);
+      match /{allPaths=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
 

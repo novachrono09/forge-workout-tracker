@@ -4497,6 +4497,9 @@ body.history-multi-mode .hist-checkbox {
   }
   function save() {
     localStorage.setItem(KEY, JSON.stringify(S));
+    if (window.VANTFirebase?.syncState) {
+      window.VANTFirebase.syncState(S);
+    }
   }
 
   const allEx = () => [...LIB, ...S.customEx];
@@ -9130,7 +9133,10 @@ body.history-multi-mode .hist-checkbox {
   });
 
   document.addEventListener("visibilitychange", () => { if (S.active) save(); });
-  window.addEventListener("beforeunload", () => save());
+  window.addEventListener("beforeunload", () => {
+    save();
+    window.VANTFirebase?.flushSync?.();
+  });
 
 
 
@@ -9208,6 +9214,33 @@ body.history-multi-mode .hist-checkbox {
   window.go = go;
   window.goBack = goBack;
   window.startRest = startRest;
+
+  const hookCloudSync = () => {
+    if (window.VANTFirebase) {
+      window.VANTFirebase.onAuthStateChanged(async (user) => {
+        if (user && !user.isAnonymous) {
+          try {
+            const merged = await window.VANTFirebase.pullAndMergeState(S);
+            if (merged) {
+              S = Object.assign(S, merged);
+              window.S = S;
+              localStorage.setItem(KEY, JSON.stringify(S));
+              document.documentElement.dataset.theme = S.profile?.theme || "dark";
+              render();
+            }
+          } catch (e) {
+            console.warn("[VANT Cloud] State sync error:", e);
+          }
+        }
+      });
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hookCloudSync);
+  } else {
+    hookCloudSync();
+  }
 })();
 </script>
 

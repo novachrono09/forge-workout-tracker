@@ -116,6 +116,21 @@ class FirebaseCloudEngine {
     if (!this.syncEngine) return false;
     return await this.syncEngine.saveProfileLocally(profileData);
   }
+
+  async syncState(state) {
+    if (!this.syncEngine) return false;
+    return await this.syncEngine.syncState(state);
+  }
+
+  async pullAndMergeState(localState) {
+    if (!this.syncEngine) return localState;
+    return await this.syncEngine.pullAndMergeState(localState);
+  }
+
+  async flushSync() {
+    if (!this.syncEngine) return false;
+    return await this.syncEngine.flushSync();
+  }
 }
 
 export const FirebaseCloud = new FirebaseCloudEngine();
