@@ -4,4 +4,5 @@
     <string name="title_activity_main">VANT</string>
     <string name="package_name">com.forge.strengthos</string>
     <string name="custom_url_scheme">com.forge.strengthos</string>
+    <string name="default_web_client_id">462534748948-t8o2vni09ctk9325bhaertp4gmddt4o7.apps.googleusercontent.com</string>
 </resources>

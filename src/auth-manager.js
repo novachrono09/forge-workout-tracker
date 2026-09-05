@@ -12,6 +12,8 @@ import {
   signOut,
   updateProfile,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInAnonymously, 
   onAuthStateChanged,
   GoogleAuthProvider, 
@@ -27,6 +29,31 @@ export class AuthManager {
   }
 
   async initializeAuth() {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const nativeState = await FirebaseAuthentication.getCurrentUser();
+        if (nativeState && nativeState.user && !this.auth.currentUser) {
+          const tokenRes = await FirebaseAuthentication.getIdToken({ forceRefresh: false }).catch(() => null);
+          if (tokenRes && tokenRes.token) {
+            const credential = GoogleAuthProvider.credential(tokenRes.token);
+            await signInWithCredential(this.auth, credential).catch(() => null);
+          }
+        }
+      } catch (err) {
+        console.warn('[VANT Auth] Native auth restore warning:', err);
+      }
+    } else {
+      try {
+        const redirectRes = await getRedirectResult(this.auth);
+        if (redirectRes && redirectRes.user) {
+          this.currentUser = redirectRes.user;
+          this.notifyListeners(redirectRes.user);
+        }
+      } catch (err) {
+        console.warn('[VANT Auth] Web redirect check warning:', err);
+      }
+    }
+
     return new Promise((resolve) => {
       onAuthStateChanged(this.auth, async (user) => {
         this.currentUser = user;
@@ -81,13 +108,26 @@ export class AuthManager {
     if (Capacitor.isNativePlatform()) {
       try {
         const result = await FirebaseAuthentication.signInWithGoogle();
-        if (result && result.credential?.idToken) {
-          const credential = GoogleAuthProvider.credential(result.credential.idToken);
+        const idToken = result?.credential?.idToken || result?.idToken;
+        if (idToken) {
+          const credential = GoogleAuthProvider.credential(idToken);
           const userCred = await signInWithCredential(this.auth, credential);
           this.currentUser = userCred.user;
           this.notifyListeners(userCred.user);
           return { user: userCred.user };
         } else if (result && result.user) {
+          try {
+            const tokenRes = await FirebaseAuthentication.getIdToken({ forceRefresh: false });
+            if (tokenRes && tokenRes.token) {
+              const credential = GoogleAuthProvider.credential(tokenRes.token);
+              const userCred = await signInWithCredential(this.auth, credential);
+              this.currentUser = userCred.user;
+              this.notifyListeners(userCred.user);
+              return { user: userCred.user };
+            }
+          } catch (tErr) {
+            console.warn('[VANT Auth] Token sync fallback warning:', tErr);
+          }
           this.currentUser = result.user;
           this.notifyListeners(result.user);
           return { user: result.user };
@@ -108,8 +148,14 @@ export class AuthManager {
       this.notifyListeners(cred.user);
       return { user: cred.user };
     } catch (err) {
-      console.error('[VANT Auth] Web Google sign in error:', err);
-      throw err;
+      console.warn('[VANT Auth] Popup sign in failed, trying redirect:', err);
+      try {
+        await signInWithRedirect(this.auth, provider);
+        return { redirect: true };
+      } catch (redirectErr) {
+        console.error('[VANT Auth] Web Google redirect error:', redirectErr);
+        throw redirectErr;
+      }
     }
   }
 

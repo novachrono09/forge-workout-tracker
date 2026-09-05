@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { HapticEngine, KeepAwake } from './native/forge-device';
 import { RestTimer } from './native/rest-timer';
 import { initNativeChrome, hideSplash } from './native/chrome';
@@ -60,6 +61,9 @@ window.addEventListener('DOMContentLoaded', () => {
 if (Capacitor.isNativePlatform()) {
   initNativeChrome();
   initBackHandler(uiBridge);
+  App.addListener('appUrlOpen', (event) => {
+    console.log('[VANT Native] Deep link URL opened:', event?.url);
+  });
   window.addEventListener('DOMContentLoaded', () => {
     hideSplash();
   });

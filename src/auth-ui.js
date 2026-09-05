@@ -252,11 +252,20 @@ export class AuthUI {
     document.getElementById('authGoogleBtn')?.addEventListener('click', async () => {
       try {
         showMessage('Connecting to Google...', 'info');
-        await window.VANTFirebase.signInWithGoogle();
-        showMessage('Signed in with Google!', 'success');
-        setTimeout(() => this.hide(), 800);
+        const res = await window.VANTFirebase.signInWithGoogle();
+        if (res && res.redirect) {
+          showMessage('Redirecting to Google Sign-In...', 'info');
+        } else {
+          showMessage('Signed in with Google!', 'success');
+          setTimeout(() => this.hide(), 800);
+        }
       } catch (err) {
-        showMessage(err.message ? err.message.replace('Firebase: ', '') : 'Sign in cancelled', 'error');
+        const msg = err.message ? err.message.replace('Firebase: ', '') : 'Sign in cancelled';
+        if (msg.includes('cancel') || msg.includes('Cancel') || msg.includes('16') || msg.includes('12501')) {
+          showMessage('Sign in cancelled', 'info');
+        } else {
+          showMessage(msg, 'error');
+        }
       }
     });
   }
