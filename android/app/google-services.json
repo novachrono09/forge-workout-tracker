@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "462534748948-2i2htacgmld3jp5mivjosk8su05ta38j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.forge.strengthos",
+            "certificate_hash": "9a4f44a9c6af4729407c68f3476799c2abc4fe14"
+          }
+        },
+        {
+          "client_id": "462534748948-p9s50710eb13b4n3ih7iaq9bt5l982ud.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.forge.strengthos",
+            "certificate_hash": "09b8044beb5fd477ee844e46cf469201883e2f00"
+          }
+        },
+        {
           "client_id": "462534748948-t8o2vni09ctk9325bhaertp4gmddt4o7.apps.googleusercontent.com",
           "client_type": 3
         }
